@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<!-- ═══ PWA — INSTALLATION COMME APP ═══ -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Livret Lille">
+<meta name="theme-color" content="#1a0f02">
+<meta name="description" content="Livret de l'Observateur Attentif — Exposition Architecture de Lille, Musée des Écoles 2025">
+
+<!-- Manifest PWA inline (pas de fichier externe requis) -->
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Livret%20Architecture%20de%20Lille%22%2C%22short_name%22%3A%22Livret%20Lille%22%2C%22description%22%3A%22Livret%20de%20l%27Observateur%20Attentif%20%E2%80%94%20Mus%C3%A9e%20des%20%C3%89coles%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%231a0f02%22%2C%22theme_color%22%3A%22%231a0f02%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D%2527http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2527%2520viewBox%253D%25270%25200%2520192%2520192%2527%253E%253Crect%2520width%253D%2527192%2527%2520height%253D%2527192%2527%2520fill%253D%2527%25231a0f02%2527%252F%253E%253Ctext%2520x%253D%252796%2527%2520y%253D%2527130%2527%2520font-size%253D%2527120%2527%2520text-anchor%253D%2527middle%2527%253E%25F0%259F%258F%259B%253C%252Ftext%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+
+<title>Livret de l'Observateur — Architecture de Lille</title>
+
+<style>
+/* ─── BANNIÈRE D'INSTALLATION PWA ─── */
+#pwa-banner {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 9999;
+  background: #1a0f02;
+  border-top: 2px solid #b8860b;
+  padding: 12px 16px;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+#pwa-banner.show { display: flex; }
+.pwa-banner-row {
+  display: flex; align-items: center; gap: 12px;
+}
+.pwa-banner-icon {
+  font-size: 32px; flex-shrink: 0;
+}
+.pwa-banner-text {
+  flex: 1;
+}
+.pwa-banner-title {
+  font-family: Georgia, serif;
+  font-size: 13px;
+  font-weight: bold;
+  color: #f0d060;
+  margin-bottom: 2px;
+}
+.pwa-banner-sub {
+  font-family: Georgia, serif;
+  font-size: 11px;
+  color: #c49a50;
+  font-style: italic;
+}
+.pwa-banner-btns {
+  display: flex; gap: 8px;
+}
+.pwa-btn-install {
+  flex: 1;
+  padding: 10px;
+  background: #b8860b;
+  color: #1a0f02;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: Georgia, serif;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+.pwa-btn-later {
+  padding: 10px 14px;
+  background: transparent;
+  color: #8a5a20;
+  border: 1px solid #5c3a10;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: Georgia, serif;
+  cursor: pointer;
+}
+
+/* ─── ÉCRAN D'INSTRUCTIONS POST-INSTALLATION ─── */
+#install-guide {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 9998;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+#install-guide.show { display: flex; }
+.guide-box {
+  background: #f2e8cc;
+  border: 2px solid #b8860b;
+  border-radius: 6px;
+  padding: 24px 20px;
+  max-width: 380px;
+  width: 100%;
+}
+.guide-title {
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #5c3a10;
+  font-style: italic;
+  margin-bottom: 4px;
+  text-align: center;
+}
+.guide-sub {
+  font-family: Georgia, serif;
+  font-size: 11px;
+  color: #8a5a20;
+  text-align: center;
+  margin-bottom: 16px;
+  font-style: italic;
+}
+.guide-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.guide-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: #5c3a10;
+  color: #f0d060;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: Georgia, serif;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.guide-step-text {
+  font-family: Georgia, serif;
+  font-size: 13px;
+  color: #1a0f02;
+  line-height: 1.5;
+}
+.guide-step-text strong { color: #5c3a10; }
+.guide-close {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background: #5c3a10;
+  color: #f0d060;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: Georgia, serif;
+  font-style: italic;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+</style>
+
+<!-- ═══ SERVICE WORKER INLINE — CACHE HORS-LIGNE ═══ -->
+<script>
+(function() {
+  // Service Worker inline via Blob — fonctionne hors-ligne
+  const SW_CODE = `
+const CACHE = 'livret-lille-v1';
+
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(cache => {
+      // Met en cache la page elle-même
+      return cache.addAll([self.location.href || '/']);
+    }).catch(() => {})
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(clients.claim());
+});
+
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request).catch(() => new Response('', {status: 503})))
+  );
+});
+`;
+
+  if ('serviceWorker' in navigator) {
+    const blob = new Blob([SW_CODE], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl, { scope: './' })
+      .then(() => console.log('SW: hors-ligne activé'))
+      .catch(e => console.log('SW non enregistré (normal en local):', e.message));
+  }
+})();
+</script>
+<style>
+/* ═══════════════════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════════════════ */
+:root {
+  --parchemin:   #f2e8cc;
+  --parchemin2:  #e8d8a8;
+  --parchemin3:  #ddc898;
+  --encre:       #1a0f02;
+  --sepia:       #5c3a10;
+  --sepia2:      #8a5a20;
+  --sepia-cl:    #c49a50;
+  --rouge:       #8b1a1a;
+  --rouge-cl:    #c0392b;
+  --vert:        #1a4a2a;
+  --vert-cl:     #2e7d42;
+  --or:          #b8860b;
+  --or-pale:     #f0d060;
+  --bleu:        #1a2a4a;
+  --brun-regle:  #6b3a10;
+  --ligne:       #ccc0a0;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  width:100%; height:100%;
+  overflow:hidden;
+  font-family: Georgia, 'Times New Roman', serif;
+  background: #2d1f0e;
+  touch-action: manipulation;
+}
+
+/* ═══════════════════════════════════════════════════
+   FOND PARCHEMIN GÉNÉRAL
+═══════════════════════════════════════════════════ */
+.parchment {
+  background: var(--parchemin);
+  background-image:
+    repeating-linear-gradient(transparent, transparent 29px, var(--ligne) 29px, var(--ligne) 30px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  position: relative;
+}
+
+.parchment::before {
+  content:'';
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background:
+    linear-gradient(to right, rgba(139,96,48,0.12) 0%, transparent 5%),
+    linear-gradient(to left, rgba(139,96,48,0.08) 0%, transparent 5%),
+    linear-gradient(to bottom, rgba(139,96,48,0.1) 0%, transparent 6%),
+    linear-gradient(to top, rgba(139,96,48,0.1) 0%, transparent 6%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* Double marge */
+.marge::after {
+  content:'';
+  position:absolute;
+  top:0; left:54px; bottom:0;
+  width:1px; background: rgba(176,48,32,0.4);
+  pointer-events:none; z-index:1;
+}
+.marge::before {
+  content:'';
+  position:absolute;
+  top:0; left:50px; bottom:0;
+  width:2px; background: rgba(176,48,32,0.25);
+  pointer-events:none; z-index:1;
+}
+
+/* ═══════════════════════════════════════════════════
+   STRUCTURE ÉCRANS
+═══════════════════════════════════════════════════ */
+#app {
+  width:100vw; height:100vh;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+.screen {
+  display:none;
+  width:100%; height:100%;
+  flex-direction:column;
+  overflow:hidden;
+}
+.screen.active { display:flex; }
+
+/* ═══════════════════════════════════════════════════
+   BARRE DE NAVIGATION
+═══════════════════════════════════════════════════ */
+.topbar {
+  background: var(--sepia);
+  padding: 10px 16px 8px;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-shrink:0;
+  border-bottom: 3px solid var(--brun-regle);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+  position:relative; z-index:10;
+}
+.topbar-title {
+  font-size: 15px;
+  color: var(--or-pale);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-style: italic;
+}
+.topbar-sub {
+  font-size: 10px;
+  color: var(--sepia-cl);
+  letter-spacing: 0.5px;
+}
+.topbar-right {
+  display:flex; gap:8px; align-items:center;
+}
+.progress-badge {
+  background: var(--or);
+  color: var(--encre);
+  border-radius: 12px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight:bold;
+  font-family: Georgia, serif;
+}
+.btn-pin {
+  background: var(--rouge);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  letter-spacing: 0.5px;
+}
+
+/* ═══════════════════════════════════════════════════
+   ONGLETS
+═══════════════════════════════════════════════════ */
+.tabs {
+  display:flex;
+  background: var(--encre);
+  flex-shrink:0;
+  overflow-x: auto;
+  scrollbar-width:none;
+  border-bottom: 2px solid var(--brun-regle);
+}
+.tabs::-webkit-scrollbar { display:none; }
+.tab {
+  padding: 10px 18px;
+  font-size: 11px;
+  color: rgba(242,232,204,0.45);
+  white-space: nowrap;
+  cursor:pointer;
+  border-bottom: 3px solid transparent;
+  font-family: Georgia, serif;
+  letter-spacing: 0.8px;
+  transition: all 0.2s;
+  user-select: none;
+  -webkit-user-select:none;
+}
+.tab:active { background: rgba(255,255,255,0.05); }
+.tab.active {
+  color: var(--or-pale);
+  border-bottom-color: var(--or-pale);
+}
+
+/* ═══════════════════════════════════════════════════
+   CONTENU SCROLLABLE
+═══════════════════════════════════════════════════ */
+.content {
+  flex:1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 20px 80px 64px;
+  position:relative;
+}
+
+/* ═══════════════════════════════════════════════════
+   COUVERTURE
+═══════════════════════════════════════════════════ */
+#screen-cover {
+  align-items:center;
+  justify-content:center;
+}
+
+.cover-wrap {
+  width:100%; height:100%;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding: 20px;
+  position:relative;
+  overflow:hidden;
+}
+
+.cover-frame {
+  position:absolute; inset:12px;
+  border: 2px solid var(--sepia);
+  pointer-events:none;
+}
+.cover-frame::after {
+  content:'';
+  position:absolute; inset:4px;
+  border: 0.5px solid var(--sepia-cl);
+}
+
+.cover-top {
+  font-size: 10px;
+  color: var(--sepia2);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.cover-h1 {
+  font-size: 36px;
+  color: var(--sepia);
+  font-style: italic;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.1;
+  text-shadow: 1px 1px 0 var(--parchemin3);
+}
+.cover-h2 {
+  font-size: 52px;
+  color: var(--sepia);
+  font-weight: bold;
+  text-align:center;
+  line-height:1;
+  letter-spacing:-1px;
+  text-shadow: 2px 2px 0 var(--parchemin3), -1px -1px 0 rgba(0,0,0,0.08);
+  margin: 4px 0 12px;
+}
+.cover-rule {
+  width: 180px; height:1px;
+  background: linear-gradient(to right, transparent, var(--sepia), transparent);
+  margin: 0 auto 6px;
+}
+.cover-sub {
+  font-size: 13px;
+  color: var(--sepia2);
+  font-style: italic;
+  text-align:center;
+  margin-bottom: 24px;
+}
+
+/* Vignettes bâtiments SVG */
+.cover-bats {
+  display:flex; gap: 12px;
+  margin-bottom: 28px;
+}
+.cover-bat-svg {
+  opacity: 0.7;
+}
+
+/* Carte identité */
+.id-card {
+  background: var(--parchemin2);
+  border: 1px solid var(--sepia-cl);
+  border-radius: 4px;
+  padding: 14px 20px 10px;
+  width: 100%;
+  max-width: 480px;
+  position:relative;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+}
+.id-card-title {
+  font-size: 9px;
+  color: var(--sepia2);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-align:center;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 0.5px solid var(--sepia-cl);
+}
+.id-fields {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.id-field label {
+  display:block;
+  font-size: 9px;
+  color: var(--sepia2);
+  font-style:italic;
+  margin-bottom: 2px;
+  letter-spacing: 0.5px;
+}
+.id-field input {
+  width:100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--sepia-cl);
+  padding: 4px 2px;
+  font-size: 14px;
+  color: var(--encre);
+  font-family: Georgia, serif;
+  outline:none;
+  -webkit-appearance: none;
+}
+.id-field input:focus {
+  border-bottom-color: var(--sepia);
+}
+.btn-start {
+  display:block;
+  width:100%;
+  margin-top: 16px;
+  background: var(--sepia);
+  color: var(--or-pale);
+  border: none;
+  padding: 14px;
+  font-size: 14px;
+  font-family: Georgia, serif;
+  font-style: italic;
+  letter-spacing: 2px;
+  cursor:pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 var(--brun-regle);
+  transition: transform 0.1s;
+}
+.btn-start:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--brun-regle); }
+
+/* ═══════════════════════════════════════════════════
+   SECTIONS COMMUNES
+═══════════════════════════════════════════════════ */
+.section-header {
+  background: var(--sepia);
+  margin: 0 -20px 16px -64px;
+  padding: 9px 20px 9px 64px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-header h2 {
+  font-size: 13px;
+  color: var(--or-pale);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.section-header .pts {
+  margin-left:auto;
+  font-size: 10px;
+  color: var(--sepia-cl);
+  font-style: italic;
+}
+
+.consigne {
+  background: rgba(248,232,168,0.4);
+  border-left: 3px solid var(--or);
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  color: var(--sepia);
+  font-style: italic;
+  line-height: 1.5;
+  border-radius: 0 3px 3px 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   VRAI / FAUX
+═══════════════════════════════════════════════════ */
+.vf-item {
+  display:flex; flex-direction:column;
+  gap: 8px;
+  padding: 12px 0 10px;
+  border-bottom: 1px dashed var(--ligne);
+  position:relative;
+}
+.vf-num {
+  position:absolute;
+  left: -42px; top: 14px;
+  width: 26px; height: 26px;
+  border: 1px solid var(--sepia-cl);
+  border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 10px;
+  color: var(--sepia2);
+  background: var(--parchemin2);
+}
+.vf-text {
+  font-size: 13px;
+  color: var(--encre);
+  line-height: 1.6;
+  padding-right: 8px;
+}
+.vf-buttons {
+  display:flex; gap: 10px;
+}
+.vf-btn {
+  flex: 1;
+  padding: 11px;
+  border: 1.5px solid;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: Georgia, serif;
+  letter-spacing: 1.5px;
+  cursor:pointer;
+  background: var(--parchemin);
+  transition: all 0.15s;
+  text-align:center;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.vf-btn.vrai { border-color: var(--vert); color: var(--vert); }
+.vf-btn.faux  { border-color: var(--rouge); color: var(--rouge); }
+.vf-btn.selected-vrai {
+  background: var(--vert); color: white;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+.vf-btn.selected-faux {
+  background: var(--rouge); color: white;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ═══════════════════════════════════════════════════
+   INTRUS
+═══════════════════════════════════════════════════ */
+.intrus-group {
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--ligne);
+}
+.intrus-consigne {
+  font-size: 12px;
+  color: var(--sepia);
+  font-style:italic;
+  margin-bottom: 10px;
+  line-height:1.5;
+}
+.intrus-items {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 8px;
+}
+.intrus-item {
+  padding: 8px 14px;
+  background: var(--parchemin2);
+  border: 1px solid var(--sepia-cl);
+  border-radius: 3px;
+  font-size: 12px;
+  color: var(--encre);
+  cursor:pointer;
+  transition: all 0.15s;
+  user-select:none;
+  -webkit-user-select:none;
+  font-family: Georgia, serif;
+}
+.intrus-item:active { transform: scale(0.97); }
+.intrus-item.barre {
+  background: var(--rouge);
+  color: white;
+  border-color: var(--rouge);
+  text-decoration: line-through;
+  text-decoration-color: rgba(255,255,255,0.7);
+}
+
+.justif-label {
+  font-size: 10px;
+  color: var(--sepia2);
+  font-style:italic;
+  margin-bottom: 3px;
+  letter-spacing:0.5px;
+}
+.justif-input {
+  width:100%;
+  min-height: 44px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--sepia-cl);
+  font-size: 13px;
+  color: var(--encre);
+  font-family: Georgia, serif;
+  outline:none;
+  resize: none;
+  -webkit-appearance: none;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════
+   MISSIONS TERRAIN
+═══════════════════════════════════════════════════ */
+.mission-block {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--ligne);
+}
+.mission-header {
+  background: var(--parchemin2);
+  border: 1px solid var(--sepia-cl);
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  display:flex; align-items:center; gap: 10px;
+}
+.mission-num {
+  background: var(--sepia);
+  color: var(--or-pale);
+  font-size: 11px;
+  padding: 3px 8px;
+  letter-spacing: 1px;
+  font-style:italic;
+  white-space:nowrap;
+}
+.mission-titre {
+  font-size: 12px;
+  color: var(--sepia);
+  font-weight:bold;
+  letter-spacing:0.3px;
+}
+
+/* Classement drag */
+.classement-list {
+  display:flex; flex-direction:column; gap:6px;
+}
+.classement-item {
+  display:flex; align-items:center; gap:10px;
+  padding: 10px 12px;
+  background: var(--parchemin2);
+  border: 1px solid var(--sepia-cl);
+  border-radius: 3px;
+}
+.classement-num {
+  width: 28px; height: 28px;
+  border: 1.5px solid var(--sepia-cl);
+  border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--parchemin);
+  font-size: 12px;
+  font-weight:bold;
+  color: var(--sepia);
+  flex-shrink:0;
+}
+.classement-num.filled {
+  background: var(--sepia);
+  color: var(--or-pale);
+  border-color: var(--sepia);
+}
+.classement-label {
+  font-size: 12px;
+  color: var(--encre);
+  flex:1;
+}
+
+/* Sélecteur de rang */
+.rang-select {
+  display:flex; flex-wrap:wrap; gap:6px;
+  margin-top: 6px;
+}
+.rang-btn {
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--sepia-cl);
+  background: var(--parchemin);
+  color: var(--sepia);
+  font-size: 14px;
+  font-weight:bold;
+  border-radius: 50%;
+  cursor:pointer;
+  font-family: Georgia, serif;
+  display:flex; align-items:center; justify-content:center;
+  transition: all 0.15s;
+}
+.rang-btn:active { transform: scale(0.9); }
+.rang-btn.used { opacity:0.3; pointer-events:none; }
+.rang-btn.selected-for { background:var(--sepia); color:var(--or-pale); border-color:var(--sepia); }
+
+/* Tableau */
+.tableau-table {
+  width:100%;
+  border-collapse: collapse;
+  font-size:12px;
+  margin-bottom:8px;
+}
+.tableau-table th {
+  background: var(--parchemin3);
+  color: var(--sepia);
+  padding: 7px 8px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform:uppercase;
+  border: 1px solid var(--sepia-cl);
+  text-align:left;
+}
+.tableau-table td {
+  padding: 6px 8px;
+  border: 1px solid var(--sepia-cl);
+  background: var(--parchemin);
+  vertical-align:top;
+}
+.tableau-table td:first-child {
+  font-weight:bold;
+  color: var(--sepia);
+  background: var(--parchemin2);
+  white-space:nowrap;
+  font-size:11px;
+}
+.tableau-input {
+  width:100%;
+  background:transparent;
+  border:none;
+  border-bottom: 1px solid var(--ligne);
+  font-size:12px;
+  color: var(--encre);
+  font-family: Georgia,serif;
+  outline:none;
+  padding: 2px 0;
+  -webkit-appearance:none;
+}
+
+/* Relier */
+.relier-grid {
+  display:grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items:center;
+  margin-bottom:8px;
+}
+.relier-item-g, .relier-item-d {
+  padding: 9px 10px;
+  background: var(--parchemin2);
+  border: 1px solid var(--sepia-cl);
+  border-radius: 3px;
+  font-size: 11px;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  transition: all 0.15s;
+  text-align:center;
+  color: var(--encre);
+  font-family: Georgia, serif;
+}
+.relier-item-g.selected { background: var(--sepia); color: var(--or-pale); border-color:var(--sepia); }
+.relier-item-d.linked   { background: var(--vert);  color: white; border-color: var(--vert); }
+.relier-arrow { font-size:18px; color: var(--sepia-cl); text-align:center; }
+
+/* Zone de dessin */
+.dessin-zone {
+  width:100%;
+  min-height: 160px;
+  background: var(--parchemin2);
+  border: 1px solid var(--sepia-cl);
+  border-radius: 3px;
+  position:relative;
+  overflow:hidden;
+  touch-action: none;
+  cursor: crosshair;
+}
+.dessin-zone canvas {
+  display:block;
+  width:100%;
+  height:100%;
+}
+.dessin-toolbar {
+  display:flex; gap:8px; align-items:center;
+  margin-top:6px;
+  flex-wrap:wrap;
+}
+.dessin-tool {
+  padding: 6px 12px;
+  border: 1px solid var(--sepia-cl);
+  background: var(--parchemin2);
+  border-radius: 3px;
+  font-size:11px;
+  cursor:pointer;
+  font-family:Georgia,serif;
+  color: var(--sepia);
+}
+.dessin-tool.active { background: var(--sepia); color: var(--or-pale); }
+.dessin-erase {
+  padding: 6px 12px;
+  border: 1px solid var(--rouge);
+  background: var(--parchemin);
+  border-radius: 3px;
+  font-size:11px;
+  cursor:pointer;
+  font-family:Georgia,serif;
+  color: var(--rouge);
+}
+.nom-detail-input {
+  flex:1;
+  min-width: 140px;
+  background:transparent;
+  border:none;
+  border-bottom: 1px solid var(--sepia-cl);
+  font-size:12px;
+  color:var(--encre);
+  font-family:Georgia,serif;
+  outline:none;
+  padding: 4px 2px;
+  -webkit-appearance:none;
+}
+
+/* Indice */
+.indice-box {
+  background: rgba(248,232,168,0.5);
+  border: 1px solid var(--or);
+  border-radius: 3px;
+  padding: 7px 10px;
+  font-size: 11px;
+  color: #7a5c00;
+  font-style:italic;
+  margin-top: 8px;
+  line-height:1.5;
+}
+.indice-box::before { content: 'Indice : '; font-weight:bold; }
+
+/* ═══════════════════════════════════════════════════
+   RÉSULTATS
+═══════════════════════════════════════════════════ */
+#screen-resultats .content {
+  display:flex; flex-direction:column; gap:16px;
+}
+.resultat-bloc {
+  background: var(--parchemin2);
+  border: 1px solid var(--sepia-cl);
+  padding: 14px 16px;
+  border-radius: 3px;
+}
+.resultat-titre {
+  font-size:11px;
+  color: var(--sepia2);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  padding-bottom:6px;
+  border-bottom: 1px solid var(--sepia-cl);
+}
+.note-display {
+  font-size: 42px;
+  color: var(--sepia);
+  font-weight:bold;
+  font-style:italic;
+  text-align:center;
+  line-height:1;
+}
+.note-max {
+  font-size:18px;
+  color: var(--sepia2);
+}
+.mention {
+  text-align:center;
+  font-size:16px;
+  color: var(--or);
+  font-style:italic;
+  margin-top:4px;
+}
+.reponse-row {
+  display:flex; align-items:flex-start; gap:8px;
+  padding: 6px 0;
+  border-bottom: 1px dotted var(--ligne);
+  font-size:12px;
+}
+.reponse-row:last-child { border-bottom:none; }
+.rep-icon { flex-shrink:0; font-size:14px; margin-top:1px; }
+.rep-text { flex:1; color: var(--encre); line-height:1.4; }
+.rep-correct { color: var(--vert); font-size:11px; font-style:italic; }
+
+/* ═══════════════════════════════════════════════════
+   TIRAGE IMAGE
+═══════════════════════════════════════════════════ */
+#screen-tirage {
+  background: var(--encre);
+}
+#screen-tirage .tirage-wrap {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding: 24px;
+  gap: 20px;
+}
+.tirage-instruction {
+  color: var(--or-pale);
+  font-size: 15px;
+  font-style:italic;
+  text-align:center;
+  line-height:1.6;
+  max-width: 360px;
+}
+.boite-svg-wrap {
+  position:relative;
+}
+.boite-tap-btn {
+  background: none;
+  border: none;
+  cursor:pointer;
+  padding:0;
+  display:block;
+}
+.boite-tap-btn:active svg { transform: scale(0.96); }
+
+.image-revelee {
+  display:none;
+  background: var(--parchemin);
+  border: 3px solid var(--or);
+  border-radius: 6px;
+  padding: 20px;
+  max-width: 320px;
+  width:100%;
+  text-align:center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  animation: cardReveal 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes cardReveal {
+  from { transform: scale(0.3) rotate(-15deg); opacity:0; }
+  to   { transform: scale(1) rotate(0deg); opacity:1; }
+}
+.image-revelee.show { display:block; }
+
+.image-revelee-vig { margin: 0 auto 12px; display:block; }
+.image-revelee-nom { font-size:18px; color:var(--sepia); font-weight:bold; margin-bottom:4px; }
+.image-revelee-date { font-size:11px; color:var(--or); letter-spacing:1px; margin-bottom:8px; }
+.image-revelee-desc { font-size:12px; color:var(--sepia2); font-style:italic; line-height:1.6; }
+.image-revelee-musee { font-size:9px; color:var(--sepia-cl); margin-top:12px; letter-spacing:1px; }
+
+.btn-nouveau { 
+  margin-top: 12px;
+  padding: 10px 24px;
+  background: var(--sepia);
+  color: var(--or-pale);
+  border:none;
+  border-radius:3px;
+  font-size:13px;
+  font-family:Georgia,serif;
+  font-style:italic;
+  cursor:pointer;
+  letter-spacing:1px;
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL PIN
+═══════════════════════════════════════════════════ */
+.modal-overlay {
+  display:none;
+  position:fixed; inset:0;
+  background: rgba(0,0,0,0.75);
+  z-index:1000;
+  align-items:center;
+  justify-content:center;
+}
+.modal-overlay.show { display:flex; }
+.modal-box {
+  background: var(--parchemin);
+  border: 2px solid var(--sepia);
+  padding: 28px 24px;
+  max-width: 340px;
+  width:90%;
+  border-radius: 4px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.modal-title {
+  font-size:13px;
+  color: var(--sepia);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:6px;
+  font-style:italic;
+}
+.modal-sub {
+  font-size:11px;
+  color: var(--sepia2);
+  margin-bottom:16px;
+  line-height:1.5;
+}
+.pin-display {
+  display:flex; gap:8px; justify-content:center; margin-bottom:16px;
+}
+.pin-dot {
+  width:14px; height:14px;
+  border-radius:50%;
+  border: 2px solid var(--sepia-cl);
+  background: transparent;
+  transition: background 0.1s;
+}
+.pin-dot.filled { background: var(--sepia); border-color:var(--sepia); }
+.pin-keypad {
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:8px;
+}
+.pin-key {
+  padding: 14px;
+  background: var(--parchemin2);
+  border: 1px solid var(--sepia-cl);
+  border-radius:3px;
+  font-size:18px;
+  font-family:Georgia,serif;
+  font-weight:bold;
+  color: var(--sepia);
+  cursor:pointer;
+  text-align:center;
+  transition: all 0.1s;
+}
+.pin-key:active { background:var(--sepia); color:var(--or-pale); transform:scale(0.96); }
+.pin-key.del { font-size:14px; color:var(--rouge); }
+.pin-error { color:var(--rouge); font-size:11px; text-align:center; margin-top:8px; font-style:italic; }
+.modal-close-btn {
+  width:100%; margin-top:12px;
+  padding:10px;
+  background:transparent;
+  border: 1px solid var(--sepia-cl);
+  color:var(--sepia2);
+  font-size:12px;
+  font-family:Georgia,serif;
+  cursor:pointer;
+  border-radius:3px;
+}
+
+/* ═══════════════════════════════════════════════════
+   CORRIGÉ (visible après PIN)
+═══════════════════════════════════════════════════ */
+.corrige-section {
+  display:none;
+  background: rgba(255,248,224,0.6);
+  border: 1px solid var(--or);
+  border-radius:3px;
+  padding:12px;
+  margin-top:8px;
+}
+.corrige-section.show { display:block; }
+.corrige-rep {
+  display:flex; gap:8px; align-items:flex-start;
+  padding: 5px 0;
+  border-bottom: 1px dotted var(--ligne);
+  font-size:12px;
+}
+.corrige-rep:last-child { border-bottom:none; }
+.corrige-badge {
+  flex-shrink:0;
+  padding: 2px 7px;
+  border-radius:10px;
+  font-size:10px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+.badge-v { background:var(--vert); color:white; }
+.badge-f { background:var(--rouge); color:white; }
+.corrige-texte { color:var(--sepia); flex:1; line-height:1.5; font-style:italic; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE / TOUCH
+═══════════════════════════════════════════════════ */
+@media (min-width: 600px) {
+  .content { padding: 20px 28px 80px 72px; }
+  .vf-text { font-size:14px; }
+  .cover-h1 { font-size:42px; }
+  .cover-h2 { font-size:60px; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+<!-- ═══════════════ COUVERTURE ═══════════════ -->
+<div id="screen-cover" class="screen active parchment marge">
+  <div class="cover-wrap">
+    <div class="cover-frame"></div>
+    <div class="cover-top">Musée des Écoles · Exposition 2025</div>
+
+    <!-- Vignettes SVG bâtiments -->
+    <div class="cover-bats">
+      <svg class="cover-bat-svg" width="52" height="64" viewBox="0 0 52 64">
+        <rect x="8" y="22" width="36" height="36" fill="#ddc898" stroke="#5c3a10" stroke-width="1.2"/>
+        <polygon points="4,22 26,4 48,22" fill="#c49a50" stroke="#5c3a10" stroke-width="1"/>
+        <rect x="14" y="30" width="8" height="12" rx="1" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.7"/>
+        <rect x="30" y="30" width="8" height="12" rx="1" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.7"/>
+        <rect x="20" y="42" width="12" height="16" fill="#5c3a10" stroke="#5c3a10" stroke-width="0.5"/>
+      </svg>
+      <svg class="cover-bat-svg" width="52" height="64" viewBox="0 0 52 64">
+        <rect x="6" y="26" width="40" height="30" fill="#ddc898" stroke="#5c3a10" stroke-width="1.2"/>
+        <polygon points="2,26 26,6 50,26" fill="#c49a50" stroke="#5c3a10" stroke-width="1"/>
+        <rect x="8" y="26" width="4" height="30" fill="#e8d8a8" stroke="#5c3a10" stroke-width="0.5"/>
+        <rect x="22" y="26" width="4" height="30" fill="#e8d8a8" stroke="#5c3a10" stroke-width="0.5"/>
+        <rect x="38" y="26" width="4" height="30" fill="#e8d8a8" stroke="#5c3a10" stroke-width="0.5"/>
+        <rect x="16" y="34" width="8" height="12" rx="2" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.7"/>
+        <rect x="28" y="34" width="8" height="12" rx="2" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.7"/>
+        <rect x="20" y="46" width="12" height="12" fill="#5c3a10"/>
+      </svg>
+      <svg class="cover-bat-svg" width="52" height="64" viewBox="0 0 52 64">
+        <rect x="4" y="30" width="44" height="26" fill="#ddc898" stroke="#5c3a10" stroke-width="1.2"/>
+        <rect x="34" y="8" width="8" height="22" fill="#ddc898" stroke="#5c3a10" stroke-width="1"/>
+        <rect x="8" y="36" width="7" height="10" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+        <rect x="19" y="36" width="7" height="10" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+        <rect x="30" y="36" width="7" height="10" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+        <path d="M4,30 Q8,22 14,22 Q14,30 4,30 Z" fill="#c49a50" stroke="#5c3a10" stroke-width="0.7"/>
+        <path d="M48,30 Q44,22 38,22 Q38,30 48,30 Z" fill="#c49a50" stroke="#5c3a10" stroke-width="0.7"/>
+        <rect x="18" y="46" width="16" height="12" fill="#5c3a10"/>
+      </svg>
+    </div>
+
+    <div class="cover-h1">Architecture</div>
+    <div class="cover-h2">de Lille</div>
+    <div class="cover-rule"></div>
+    <div class="cover-sub">Livret de l'Observateur Attentif</div>
+
+    <div class="id-card">
+      <div class="id-card-title">✦ Identité du Visiteur ✦</div>
+      <div class="id-fields">
+        <div class="id-field">
+          <label>Prénom & Nom</label>
+          <input type="text" id="inp-nom" placeholder="..." autocomplete="off" autocorrect="off">
+        </div>
+        <div class="id-field">
+          <label>Âge</label>
+          <input type="number" id="inp-age" placeholder="..." min="1" max="120">
+        </div>
+        <div class="id-field" style="grid-column:1/-1">
+          <label>Date de visite</label>
+          <input type="date" id="inp-date">
+        </div>
+      </div>
+      <button class="btn-start" onclick="demarrer()">
+        ✦ Commencer la visite ✦
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ LIVRET PRINCIPAL ═══════════════ -->
+<div id="screen-livret" class="screen">
+
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Livret de l'Observateur</div>
+      <div class="topbar-sub" id="topbar-visiteur">Architecture de Lille</div>
+    </div>
+    <div class="topbar-right">
+      <div class="progress-badge" id="progress-badge">0 / 20</div>
+      <button class="btn-pin" onclick="ouvrirPin()">🔐 Corrigé</button>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-tab="vf" onclick="switchTab('vf',this)">I — Vrai / Faux</div>
+    <div class="tab" data-tab="intrus" onclick="switchTab('intrus',this)">II — Intrus</div>
+    <div class="tab" data-tab="missions" onclick="switchTab('missions',this)">III — Missions</div>
+    <div class="tab" data-tab="fin" onclick="switchTab('fin',this)">✦ Résultats</div>
+  </div>
+
+  <!-- TAB : VRAI / FAUX -->
+  <div id="tab-vf" class="content parchment marge tab-content active">
+    <div class="section-header">
+      <h2>Épreuve I — Vrai ou Faux ?</h2>
+      <span class="pts">6 pts</span>
+    </div>
+    <div class="consigne">
+      Lisez chaque affirmation. Partez vérifier dans l'exposition, puis cochez VRAI ou FAUX.
+      Attention — certaines affirmations sont subtiles !
+    </div>
+    <div id="vf-container"></div>
+
+    <div style="margin-top:16px; text-align:right;">
+      <button class="btn-start" style="display:inline-block;width:auto;padding:12px 24px;" onclick="switchTab('intrus', document.querySelector('[data-tab=intrus]'))">
+        Partie suivante →
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB : INTRUS -->
+  <div id="tab-intrus" class="content parchment marge tab-content" style="display:none">
+    <div class="section-header">
+      <h2>Épreuve I — Trouve l'intrus</h2>
+      <span class="pts">4.5 pts</span>
+    </div>
+    <div class="consigne">
+      Dans chaque série, un élément ne correspond pas aux autres. Touchez-le pour le barrer, puis justifiez votre choix par écrit.
+    </div>
+    <div id="intrus-container"></div>
+  </div>
+
+  <!-- TAB : MISSIONS -->
+  <div id="tab-missions" class="content parchment marge tab-content" style="display:none">
+    <div class="section-header">
+      <h2>Épreuve II — Missions de terrain</h2>
+      <span class="pts">10 pts</span>
+    </div>
+    <div class="consigne">
+      Les réponses s'obtiennent en observant les panneaux et les documents de l'exposition.
+    </div>
+    <div id="missions-container"></div>
+  </div>
+
+  <!-- TAB : RÉSULTATS / FIN -->
+  <div id="tab-fin" class="content parchment marge tab-content" style="display:none">
+    <div class="section-header">
+      <h2>Résultats & Récompense</h2>
+    </div>
+    <div id="resultats-container"></div>
+    <div style="margin-top:20px; text-align:center;">
+      <button class="btn-start" style="display:inline-block;width:auto;padding:14px 32px;" onclick="allerTirage()">
+        ✦ Tirer mon image ✦
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TIRAGE ═══════════════ -->
+<div id="screen-tirage" class="screen">
+  <div class="topbar" style="background:#1a0f02; border-bottom-color:#5c3a10;">
+    <div>
+      <div class="topbar-title" style="color:var(--or-pale);">Récompense</div>
+      <div class="topbar-sub" style="color:#8a6030;">Tirage de votre image</div>
+    </div>
+    <button class="btn-pin" style="background:var(--sepia);" onclick="showScreen('screen-livret')">← Retour</button>
+  </div>
+
+  <div class="tirage-wrap">
+    <div class="tirage-instruction" id="tirage-instruction">
+      Bravo pour votre visite !<br>
+      Tapez sur la boîte pour tirer votre image de collection.
+    </div>
+
+    <button class="boite-tap-btn" id="boite-btn" onclick="tirerImage()">
+      <svg width="160" height="120" viewBox="0 0 160 120">
+        <!-- Boîte en bois style XIXe -->
+        <rect x="10" y="50" width="140" height="65" rx="3" fill="#7a5628" stroke="#5c3a10" stroke-width="2"/>
+        <rect x="10" y="50" width="140" height="65" rx="3" fill="url(#bois)"/>
+        <!-- Couvercle -->
+        <rect x="6" y="38" width="148" height="18" rx="3" fill="#8a6030" stroke="#5c3a10" stroke-width="2"/>
+        <rect x="6" y="38" width="148" height="18" rx="3" fill="url(#bois2)" opacity="0.5"/>
+        <!-- Serrure -->
+        <rect x="70" y="52" width="20" height="14" rx="2" fill="#b8860b" stroke="#8a6030" stroke-width="1"/>
+        <circle cx="80" cy="57" r="3" fill="#5c3a10"/>
+        <!-- Poignée couvercle -->
+        <path d="M65,38 Q80,28 95,38" fill="none" stroke="#b8860b" stroke-width="3" stroke-linecap="round"/>
+        <!-- Lignes bois -->
+        <line x1="10" y1="65" x2="150" y2="65" stroke="#5c3a10" stroke-width="0.5" opacity="0.4"/>
+        <line x1="10" y1="80" x2="150" y2="80" stroke="#5c3a10" stroke-width="0.5" opacity="0.4"/>
+        <line x1="10" y1="95" x2="150" y2="95" stroke="#5c3a10" stroke-width="0.5" opacity="0.4"/>
+        <!-- Texte -->
+        <text x="80" y="75" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="#f0d060" font-style="italic">Images</text>
+        <text x="80" y="87" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#c49a50">de collection</text>
+        <defs>
+          <pattern id="bois" x="0" y="0" width="8" height="120" patternUnits="userSpaceOnUse">
+            <rect width="8" height="120" fill="none"/>
+            <line x1="4" y1="0" x2="4" y2="120" stroke="#5c3a10" stroke-width="0.3" opacity="0.3"/>
+          </pattern>
+          <pattern id="bois2" x="0" y="0" width="8" height="18" patternUnits="userSpaceOnUse">
+            <rect width="8" height="18" fill="none"/>
+            <line x1="4" y1="0" x2="4" y2="18" stroke="white" stroke-width="0.3" opacity="0.2"/>
+          </pattern>
+        </defs>
+      </svg>
+    </button>
+
+    <div class="image-revelee" id="image-revelee">
+      <svg class="image-revelee-vig" id="tirage-vig" width="100" height="80" viewBox="0 0 100 80"></svg>
+      <div class="image-revelee-nom" id="tirage-nom"></div>
+      <div class="image-revelee-date" id="tirage-date"></div>
+      <div class="image-revelee-desc" id="tirage-desc"></div>
+      <div class="image-revelee-musee">Musée des Écoles · Lille 2025</div>
+      <button class="btn-nouveau" onclick="nouveauTirage()">Tirer une autre image</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL PIN ═══════════════ -->
+<div class="modal-overlay" id="modal-pin">
+  <div class="modal-box">
+    <div class="modal-title">Code du Gardien</div>
+    <div class="modal-sub">Entrez le code PIN pour accéder au corrigé.</div>
+    <div class="pin-display" id="pin-display">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-keypad">
+      <div class="pin-key" onclick="pinKey('1')">1</div>
+      <div class="pin-key" onclick="pinKey('2')">2</div>
+      <div class="pin-key" onclick="pinKey('3')">3</div>
+      <div class="pin-key" onclick="pinKey('4')">4</div>
+      <div class="pin-key" onclick="pinKey('5')">5</div>
+      <div class="pin-key" onclick="pinKey('6')">6</div>
+      <div class="pin-key" onclick="pinKey('7')">7</div>
+      <div class="pin-key" onclick="pinKey('8')">8</div>
+      <div class="pin-key" onclick="pinKey('9')">9</div>
+      <div class="pin-key" onclick="pinKey('0')">0</div>
+      <div class="pin-key del" onclick="pinDel()">⌫</div>
+    </div>
+    <div class="pin-error" id="pin-error"></div>
+    <button class="modal-close-btn" onclick="fermerPin()">Annuler</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  DONNÉES
+// ═══════════════════════════════════════════════════
+
+const PIN_CORRECT = "1848"; // Année révolutions en Europe — à communiquer au gardien
+
+const VF_DATA = [
+  {
+    id:"vf1",
+    texte: "La Vieille Bourse (1652) est construite selon le style de la Renaissance flamande, caractérisé par ses 24 maisons identiques encadrant une cour intérieure.",
+    correct: true,
+    explication: "VRAI — Style Renaissance flamande, 24 maisons, cour intérieure au cœur de la Grand'Place."
+  },
+  {
+    id:"vf2",
+    texte: "Le Tri Postal, reconverti en espace culturel lors de Lille 2004, était initialement un entrepôt ferroviaire de marchandises.",
+    correct: false,
+    explication: "FAUX — C'était un centre de tri des COLIS POSTAUX, non ferroviaire."
+  },
+  {
+    id:"vf3",
+    texte: "L'Hospice Comtesse, fondé en 1237 par la Comtesse Jeanne de Flandre, constitue l'un des rares ensembles hospitaliers médiévaux conservés en France.",
+    correct: true,
+    explication: "VRAI — Fondé en 1237, c'est l'un des plus anciens ensembles hospitaliers médiévaux de France."
+  },
+  {
+    id:"vf4",
+    texte: "Le style éclectique du Palais Rameau (XIXe siècle) consiste à emprunter des éléments à plusieurs courants architecturaux distincts.",
+    correct: true,
+    explication: "VRAI — L'éclectisme mélange volontairement les répertoires stylistiques."
+  },
+  {
+    id:"vf5",
+    texte: "Les Filatures du Port fluvial témoignent du passé textile de Lille, qui fut surnommée la « Manchester du Nord » au XIXe siècle.",
+    correct: true,
+    explication: "VRAI — Lille, capitale du textile au XIXe siècle, mérita ce surnom."
+  },
+  {
+    id:"vf6",
+    texte: "La Noble Tour, seul vestige des remparts médiévaux de Lille, fut construite au XVIe siècle pour résister aux canons de l'époque.",
+    correct: false,
+    explication: "FAUX — La Noble Tour date du XIVe siècle (et non du XVIe)."
+  },
+];
+
+const INTRUS_DATA = [
+  {
+    id:"in1",
+    consigne: "Ces édifices ont tous connu une RECONVERSION d'usage, sauf un qui n'a jamais changé de fonction principale :",
+    items: ["Tri Postal", "Gare St-Sauveur", "Fives Cail", "Hospice Gantois", "Vieille Bourse"],
+    intrus: 4,
+    explication: "La Vieille Bourse conserve sa vocation de lieu de commerce et de vie culturelle depuis 1652."
+  },
+  {
+    id:"in2",
+    consigne: "Ces termes désignent tous un STYLE ou une PÉRIODE architecturale, sauf un terme purement technique :",
+    items: ["Gothique flamand", "Éclectique", "Voussure", "Baroque", "Néo-classique"],
+    intrus: 2,
+    explication: "Une voussure est un élément constructif (arc), non un style. Les autres sont des mouvements architecturaux."
+  },
+  {
+    id:"in3",
+    consigne: "Ces bâtiments ont tous été liés à la SANTÉ ou à l'assistance sociale, sauf un :",
+    items: ["Hospice Comtesse", "Hospice Gantois", "Hospice Général", "Palais Rihour", "Pavillon St-Sauveur"],
+    intrus: 3,
+    explication: "Le Palais Rihour était la résidence des Ducs de Bourgogne — lieu de pouvoir, jamais de soin."
+  },
+];
+
+const MISSIONS_DATA = [
+  {
+    id:"m1",
+    type:"classement",
+    titre:"MISSION I — Chronologie",
+    texte:"Ordonnez ces édifices du plus ancien (1) au plus récent (5) :",
+    items:["Noble Tour (remparts)", "Vieille Bourse", "Palais Rameau", "Gare Saint-Sauveur", "Euralille"],
+    ordre_correct:[1,2,3,4,5],
+    indice:"Les dates figurent sur chaque panneau. Le plus ancien remonte au XIVe siècle.",
+    pts:2
+  },
+  {
+    id:"m2",
+    type:"tableau",
+    titre:"MISSION II — Matériaux & Styles",
+    texte:"Complétez en observant les photographies de l'exposition :",
+    lignes:[
+      {bat:"Hospice Comtesse", mat:"", style:"", siecle:""},
+      {bat:"Vieille Bourse",   mat:"", style:"", siecle:""},
+      {bat:"Fives Cail",       mat:"", style:"", siecle:""},
+    ],
+    indice:"Brique, pierre de taille, métal, béton : chaque siècle a ses matériaux.",
+    pts:2
+  },
+  {
+    id:"m3",
+    type:"relier",
+    titre:"MISSION III — Reconversions",
+    texte:"Reliez chaque bâtiment à son usage ACTUEL en touchant d'abord le bâtiment, puis l'usage :",
+    gauche:["Tri Postal","Couvent des Minimes","Hospice Gantois","Gare Saint-Sauveur"],
+    droite:["Hôtel de prestige","Centre de tri colis","Friche culturelle","Hôtel de luxe"],
+    liaisons_correctes:[1,0,3,2],
+    indice:"Un couvent est devenu un hôtel 5 étoiles sous une immense verrière contemporaine.",
+    pts:3
+  },
+  {
+    id:"m4",
+    type:"dessin",
+    titre:"MISSION IV — Croquis d'architecture",
+    texte:"Choisissez un détail visible sur les documents (voûte, ornement, fenêtre...) et reproduisez-le. Nommez-le.",
+    indice:"Les rosaces, les arcs en ogive et les frises décoratives sont de bons sujets.",
+    pts:3
+  },
+];
+
+const IMAGES_COLLECTION = [
+  {nom:"Hospice Comtesse",    date:"XIIIe siècle",  desc:"Fondée en 1237 par la Comtesse Jeanne de Flandre. L'un des rares hôpitaux médiévaux conservés de France.", style:"gothique"},
+  {nom:"Vieille Bourse",      date:"1652",           desc:"24 maisons encadrant une cour intérieure. Joyau de la Renaissance flamande au cœur de la Grand'Place.", style:"baroque"},
+  {nom:"La Grande Garde",     date:"1717",           desc:"Corps de garde royale sous Louis XIV, devenu le Théâtre du Nord, scène nationale de Lille.", style:"baroque"},
+  {nom:"Palais Rihour",       date:"XVe siècle",    desc:"Résidence des Ducs de Bourgogne. Ses voûtes gothiques abritent aujourd'hui l'Office de Tourisme.", style:"gothique"},
+  {nom:"Palais Rameau",       date:"XIXe siècle",   desc:"Palais d'horticulture éclectique reconverti en laboratoire d'agriculture urbaine et d'alimentation durable.", style:"eclectique"},
+  {nom:"Tri Postal",          date:"XXe siècle",    desc:"Ancien centre de tri des colis postaux, devenu depuis Lille 2004 le haut lieu de l'art contemporain lillois.", style:"industriel"},
+  {nom:"Fives Cail",          date:"XIXe siècle",   desc:"Géant de la métallurgie — la charpente de la Gare d'Orsay y fut forgée — aujourd'hui éco-quartier gourmand.", style:"industriel"},
+  {nom:"Hospice Gantois",     date:"XVe siècle",    desc:"Refuge des nécessiteux pendant 500 ans, reconverti en hôtel de luxe 5 étoiles où la brique raconte la charité.", style:"gothique"},
+  {nom:"Gare Saint-Sauveur",  date:"XIXe siècle",   desc:"Ancienne gare de marchandises transformée en friche culturelle, rendez-vous des familles et des artistes.", style:"industriel"},
+  {nom:"Couvent des Minimes", date:"XVIIe siècle",  desc:"Cloître baroque préservé avec soin, devenu un hôtel de prestige sous une immense verrière contemporaine.", style:"baroque"},
+  {nom:"Noble Tour",          date:"XIVe siècle",   desc:"Seule survivante des remparts médiévaux de Lille, en cours de restauration pour devenir lieu de mémoire.", style:"medieval"},
+  {nom:"Porte de Paris",      date:"1692",           desc:"Arc de triomphe élevé à la gloire de Louis XIV, témoin de la ceinture défensive de la ville.", style:"baroque"},
+  {nom:"Fac. de Médecine",    date:"XXe siècle",    desc:"Édifice monumental symbolisant le rayonnement scientifique et médical de Lille au siècle dernier.", style:"baroque"},
+  {nom:"Anc. Malteries",      date:"XIXe siècle",   desc:"Mémoire du passé brassicole du Nord, ces structures industrielles imposantes retrouvent une vie urbaine.", style:"industriel"},
+];
+
+// ═══════════════════════════════════════════════════
+//  ÉTAT GLOBAL
+// ═══════════════════════════════════════════════════
+const etat = {
+  vf: {},           // {vf1: true/false, ...}
+  intrus: {},       // {in1: 2, ...}  index de l'item barré
+  justif: {},       // {in1: "texte"}
+  tableau: {},      // {m2_0_mat: "brique", ...}
+  classement: {},   // {m1: [2,4,1,3,5]}
+  relier: {},       // {m3: [1,null,3,2]}
+  dessin: {},       // canvas data
+  dessin_nom: {},
+};
+
+let pinBuffer = "";
+let relierSelectionG = null;
+let currentDessinCanvas = null;
+let currentDessinCtx = null;
+let dessinDrawing = false;
+let dessinMode = "draw";
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.style.display='none');
+  if(el) el.classList.add('active');
+  const tc = document.getElementById('tab-'+id);
+  if(tc) tc.style.display='block';
+  if(id === 'fin') renderResultats();
+}
+
+function demarrer() {
+  const nom = document.getElementById('inp-nom').value.trim() || 'Visiteur';
+  document.getElementById('topbar-visiteur').textContent = nom + ' — ' + (document.getElementById('inp-date').value || new Date().toLocaleDateString('fr-FR'));
+  showScreen('screen-livret');
+  renderAll();
+}
+
+function allerTirage() {
+  document.getElementById('image-revelee').classList.remove('show');
+  document.getElementById('boite-btn').style.display='block';
+  document.getElementById('tirage-instruction').textContent = "Bravo pour votre visite ! Tapez sur la boîte pour tirer votre image de collection.";
+  showScreen('screen-tirage');
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDU VRAI / FAUX
+// ═══════════════════════════════════════════════════
+function renderVF() {
+  const container = document.getElementById('vf-container');
+  container.innerHTML = VF_DATA.map((item,i) => `
+    <div class="vf-item">
+      <div class="vf-num">${i+1}</div>
+      <div class="vf-text">${item.texte}</div>
+      <div class="vf-buttons">
+        <div class="vf-btn vrai ${etat.vf[item.id]==='vrai'?'selected-vrai':''}"
+             ontouchstart="this.style.opacity=0.8" ontouchend="this.style.opacity=1"
+             onclick="selectVF('${item.id}','vrai')">VRAI</div>
+        <div class="vf-btn faux ${etat.vf[item.id]==='faux'?'selected-faux':''}"
+             ontouchstart="this.style.opacity=0.8" ontouchend="this.style.opacity=1"
+             onclick="selectVF('${item.id}','faux')">FAUX</div>
+      </div>
+    </div>
+  `).join('');
+  updateProgress();
+}
+
+function selectVF(id, val) {
+  etat.vf[id] = etat.vf[id] === val ? null : val;
+  renderVF();
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDU INTRUS
+// ═══════════════════════════════════════════════════
+function renderIntrus() {
+  const container = document.getElementById('intrus-container');
+  container.innerHTML = INTRUS_DATA.map((serie, si) => `
+    <div class="intrus-group">
+      <div style="font-size:11px;color:var(--sepia2);font-style:italic;margin-bottom:4px;">Série ${si+1}</div>
+      <div class="intrus-consigne">${serie.consigne}</div>
+      <div class="intrus-items">
+        ${serie.items.map((item,i) => `
+          <div class="intrus-item ${etat.intrus[serie.id]===i?'barre':''}"
+               onclick="selectIntrus('${serie.id}',${i})">${item}</div>
+        `).join('')}
+      </div>
+      <div class="justif-label">Justification — Pourquoi est-ce l'intrus ?</div>
+      <textarea class="justif-input"
+        placeholder="Répondez ici..."
+        oninput="etat.justif['${serie.id}']=this.value"
+        rows="2">${etat.justif[serie.id]||''}</textarea>
+    </div>
+  `).join('');
+  updateProgress();
+}
+
+function selectIntrus(id, idx) {
+  etat.intrus[id] = etat.intrus[id] === idx ? null : idx;
+  renderIntrus();
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDU MISSIONS
+// ═══════════════════════════════════════════════════
+function renderMissions() {
+  const container = document.getElementById('missions-container');
+  container.innerHTML = MISSIONS_DATA.map(m => renderMission(m)).join('');
+  // Init dessin après rendu
+  MISSIONS_DATA.filter(m=>m.type==='dessin').forEach(m => initDessin(m.id));
+  updateProgress();
+}
+
+function renderMission(m) {
+  let corps = '';
+  if(m.type === 'classement') corps = renderClassement(m);
+  else if(m.type === 'tableau') corps = renderTableau(m);
+  else if(m.type === 'relier') corps = renderRelier(m);
+  else if(m.type === 'dessin') corps = renderDessin(m);
+  return `
+    <div class="mission-block" id="mission-${m.id}">
+      <div class="mission-header">
+        <span class="mission-num">${m.titre.split('—')[0].trim()}</span>
+        <span class="mission-titre">${m.titre.split('—')[1]?.trim()||''}</span>
+      </div>
+      <div class="consigne" style="margin-bottom:10px">${m.texte}</div>
+      ${corps}
+      <div class="indice-box">${m.indice}</div>
+    </div>`;
+}
+
+function renderClassement(m) {
+  const rangs = etat.classement[m.id] || new Array(m.items.length).fill(null);
+  etat.classement[m.id] = rangs;
+  const usedRangs = rangs.filter(r=>r!==null);
+  return `
+    <div class="classement-list">
+      ${m.items.map((item,i) => `
+        <div class="classement-item">
+          <div class="classement-num ${rangs[i]!==null?'filled':''}">${rangs[i]!==null?rangs[i]:''}</div>
+          <div class="classement-label">${item}</div>
+          <div class="rang-select">
+            ${m.items.map((_,r) => `
+              <div class="rang-btn
+                ${usedRangs.includes(r+1) && rangs[i]!==r+1 ? 'used' : ''}
+                ${rangs[i]===r+1?'selected-for':''}"
+                onclick="setRang('${m.id}',${i},${r+1})">${r+1}</div>
+            `).join('')}
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function setRang(mid, itemIdx, rang) {
+  const rangs = etat.classement[mid];
+  const prevIdx = rangs.indexOf(rang);
+  if(prevIdx !== -1 && prevIdx !== itemIdx) rangs[prevIdx] = null;
+  rangs[itemIdx] = rangs[itemIdx] === rang ? null : rang;
+  etat.classement[mid] = rangs;
+  renderMissions();
+}
+
+function renderTableau(m) {
+  return `
+    <table class="tableau-table">
+      <tr>
+        <th>Bâtiment</th>
+        <th>Matériau</th>
+        <th>Style</th>
+        <th>Siècle</th>
+      </tr>
+      ${m.lignes.map((l,ri) => `
+        <tr>
+          <td>${l.bat}</td>
+          <td><input class="tableau-input" placeholder="..."
+            oninput="etat.tableau['${m.id}_${ri}_mat']=this.value"
+            value="${etat.tableau[m.id+'_'+ri+'_mat']||''}"></td>
+          <td><input class="tableau-input" placeholder="..."
+            oninput="etat.tableau['${m.id}_${ri}_sty']=this.value"
+            value="${etat.tableau[m.id+'_'+ri+'_sty']||''}"></td>
+          <td><input class="tableau-input" placeholder="..."
+            oninput="etat.tableau['${m.id}_${ri}_siec']=this.value"
+            value="${etat.tableau[m.id+'_'+ri+'_siec']||''}"></td>
+        </tr>`).join('')}
+    </table>`;
+}
+
+function renderRelier(m) {
+  const liaisons = etat.relier[m.id] || new Array(m.gauche.length).fill(null);
+  etat.relier[m.id] = liaisons;
+  return `
+    <div style="font-size:11px;color:var(--sepia2);font-style:italic;margin-bottom:8px;">
+      Touchez d'abord un bâtiment (colonne gauche), puis son usage actuel (colonne droite).
+    </div>
+    <div>
+      ${m.gauche.map((g,gi) => {
+        const liaisonIdx = liaisons[gi];
+        const droiteLabel = liaisonIdx!==null ? m.droite[liaisonIdx] : null;
+        return `
+        <div style="display:grid;grid-template-columns:1fr 24px 1fr;gap:6px;align-items:center;margin-bottom:6px;">
+          <div class="relier-item-g ${relierSelectionG===gi?'selected':''}"
+               onclick="relierSelectG('${m.id}',${gi})">${g}</div>
+          <div style="text-align:center;font-size:18px;color:${droiteLabel?'var(--vert-cl)':'var(--sepia-cl)'}">
+            ${droiteLabel?'→':'·'}
+          </div>
+          <div style="font-size:11px;color:var(--vert-cl);font-style:italic;padding:4px 6px;
+            background:${droiteLabel?'rgba(46,126,66,0.1)':'transparent'};
+            border:1px solid ${droiteLabel?'var(--vert-cl)':'transparent'};border-radius:3px;">
+            ${droiteLabel||''}
+          </div>
+        </div>`}).join('')}
+      <div style="margin-top:10px;">
+        <div style="font-size:10px;color:var(--sepia2);font-style:italic;margin-bottom:6px;">Usages actuels :</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${m.droite.map((d,di) => {
+            const deja = liaisons.indexOf(di) !== -1;
+            return `<div class="relier-item-d ${deja?'linked':''}"
+              onclick="relierSelectD('${m.id}',${di})">${d}</div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function relierSelectG(mid, gi) {
+  relierSelectionG = relierSelectionG === gi ? null : gi;
+  renderMissions();
+}
+function relierSelectD(mid, di) {
+  if(relierSelectionG === null) return;
+  const liaisons = etat.relier[mid];
+  // Enlever liaison existante sur cette droite
+  const prev = liaisons.indexOf(di);
+  if(prev !== -1) liaisons[prev] = null;
+  liaisons[relierSelectionG] = di;
+  relierSelectionG = null;
+  etat.relier[mid] = liaisons;
+  renderMissions();
+}
+
+function renderDessin(m) {
+  return `
+    <div class="dessin-zone" id="dessin-zone-${m.id}">
+      <canvas id="dessin-canvas-${m.id}" style="width:100%;height:160px;display:block;"></canvas>
+    </div>
+    <div class="dessin-toolbar">
+      <div class="dessin-tool active" id="tool-draw-${m.id}" onclick="setDessinMode('${m.id}','draw',this)">✏ Dessiner</div>
+      <div class="dessin-tool" id="tool-thin-${m.id}" onclick="setDessinMode('${m.id}','thin',this)">Fine</div>
+      <div class="dessin-erase" onclick="effacerDessin('${m.id}')">✕ Effacer</div>
+      <input class="nom-detail-input" placeholder="Nom du détail dessiné..."
+        oninput="etat.dessin_nom['${m.id}']=this.value"
+        value="${etat.dessin_nom[m.id]||''}">
+    </div>`;
+}
+
+function initDessin(mid) {
+  const canvas = document.getElementById('dessin-canvas-'+mid);
+  if(!canvas) return;
+  canvas.width  = canvas.offsetWidth  || 400;
+  canvas.height = 160;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#e8d8a8';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  // Quadrillage léger
+  ctx.strokeStyle = '#ddd0b0';
+  ctx.lineWidth = 0.5;
+  for(let x=0;x<canvas.width;x+=20){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke(); }
+  for(let y=0;y<canvas.height;y+=20){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke(); }
+  ctx.strokeStyle = '#5c3a10';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  let drawing = false, lastX=0, lastY=0, mode='draw';
+
+  function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / r.width;
+    const scaleY = canvas.height / r.height;
+    const src = e.touches ? e.touches[0] : e;
+    return [(src.clientX - r.left)*scaleX, (src.clientY - r.top)*scaleY];
+  }
+
+  function start(e) {
+    e.preventDefault();
+    drawing = true;
+    [lastX, lastY] = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX, lastY);
+  }
+  function move(e) {
+    e.preventDefault();
+    if(!drawing) return;
+    const [x,y] = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX, lastY);
+    if(mode==='erase') {
+      ctx.strokeStyle='#e8d8a8'; ctx.lineWidth=20;
+    } else if(mode==='thin') {
+      ctx.strokeStyle='#5c3a10'; ctx.lineWidth=1;
+    } else {
+      ctx.strokeStyle='#5c3a10'; ctx.lineWidth=2.5;
+    }
+    ctx.lineTo(x,y); ctx.stroke();
+    [lastX,lastY]=[x,y];
+  }
+  function end(e) { e.preventDefault(); drawing=false; etat.dessin[mid]=canvas.toDataURL(); }
+
+  canvas.addEventListener('touchstart', start, {passive:false});
+  canvas.addEventListener('touchmove',  move,  {passive:false});
+  canvas.addEventListener('touchend',   end,   {passive:false});
+  canvas.addEventListener('mousedown',  start);
+  canvas.addEventListener('mousemove',  move);
+  canvas.addEventListener('mouseup',    end);
+
+  canvas._mode = mode;
+  canvas._setMode = (m) => { canvas._mode = m; mode = m; };
+  canvas._effacer = () => {
+    ctx.fillStyle='#e8d8a8'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle='#ddd0b0'; ctx.lineWidth=0.5;
+    for(let x2=0;x2<canvas.width;x2+=20){ ctx.beginPath();ctx.moveTo(x2,0);ctx.lineTo(x2,canvas.height);ctx.stroke(); }
+    for(let y2=0;y2<canvas.height;y2+=20){ ctx.beginPath();ctx.moveTo(0,y2);ctx.lineTo(canvas.width,y2);ctx.stroke(); }
+    etat.dessin[mid]=null;
+  };
+}
+
+function setDessinMode(mid, mode, el) {
+  const canvas = document.getElementById('dessin-canvas-'+mid);
+  if(canvas && canvas._setMode) canvas._setMode(mode);
+  document.querySelectorAll(`[id^="tool-"][id$="-${mid}"]`).forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+function effacerDessin(mid) {
+  const canvas = document.getElementById('dessin-canvas-'+mid);
+  if(canvas && canvas._effacer) canvas._effacer();
+}
+
+// ═══════════════════════════════════════════════════
+//  RÉSULTATS
+// ═══════════════════════════════════════════════════
+function renderResultats() {
+  let score = 0;
+  const container = document.getElementById('resultats-container');
+  let html = '';
+
+  // Score VF
+  let scoreVF = 0;
+  VF_DATA.forEach(item => {
+    const rep = etat.vf[item.id];
+    const ok = (rep==='vrai' && item.correct) || (rep==='faux' && !item.correct);
+    if(ok) scoreVF++;
+  });
+  score += scoreVF;
+
+  // Score intrus (1pt chacun)
+  let scoreIntrus = 0;
+  INTRUS_DATA.forEach(serie => {
+    if(etat.intrus[serie.id] === serie.intrus) scoreIntrus += 1;
+  });
+  score += scoreIntrus;
+
+  // Missions = 10pts (auto-evalués)
+  html += `
+    <div class="resultat-bloc">
+      <div class="resultat-titre">Épreuve I — Résultats automatiques</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div style="text-align:center;padding:10px;background:var(--parchemin2);border:1px solid var(--sepia-cl);border-radius:3px;">
+          <div style="font-size:10px;color:var(--sepia2);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Vrai / Faux</div>
+          <div style="font-size:32px;font-weight:bold;color:var(--sepia);font-style:italic;">${scoreVF}<span style="font-size:16px;color:var(--sepia2)">/6</span></div>
+        </div>
+        <div style="text-align:center;padding:10px;background:var(--parchemin2);border:1px solid var(--sepia-cl);border-radius:3px;">
+          <div style="font-size:10px;color:var(--sepia2);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Intrus</div>
+          <div style="font-size:32px;font-weight:bold;color:var(--sepia);font-style:italic;">${scoreIntrus}<span style="font-size:16px;color:var(--sepia2)">/3</span></div>
+        </div>
+      </div>
+
+      ${VF_DATA.map(item => {
+        const rep = etat.vf[item.id];
+        const ok = (rep==='vrai' && item.correct)||(rep==='faux'&&!item.correct);
+        const noRep = !rep;
+        return `<div class="reponse-row">
+          <span class="rep-icon">${noRep?'○':ok?'✓':'✗'}</span>
+          <div>
+            <div class="rep-text" style="font-size:11px;color:${noRep?'var(--sepia2)':ok?'var(--vert)':'var(--rouge)'}">${item.texte.substring(0,60)}...</div>
+            <div class="rep-correct">${item.explication}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="resultat-bloc">
+      <div class="resultat-titre">Épreuve II — À évaluer avec le gardien</div>
+      <div style="background:rgba(248,232,168,0.4);border:1px solid var(--or);border-radius:3px;padding:10px;font-size:12px;color:var(--sepia);font-style:italic;line-height:1.6;">
+        Les missions de terrain (chronologie, tableau, liaisons, croquis) sont évaluées sur 10 points
+        par le gardien à l'aide de la feuille de correction imprimée.
+      </div>
+    </div>
+
+    <div class="resultat-bloc" style="text-align:center;">
+      <div class="resultat-titre">Score Épreuve I</div>
+      <div class="note-display">${score}<span class="note-max">/10</span></div>
+      <div class="mention">${getMention(score*2)}</div>
+      <div style="font-size:11px;color:var(--sepia2);margin-top:8px;font-style:italic;">
+        + jusqu'à 10 pts avec les missions de terrain
+      </div>
+    </div>`;
+
+  container.innerHTML = html;
+  updateProgress();
+}
+
+function getMention(note) {
+  if(note >= 18) return "✦ Félicitations du jury ✦";
+  if(note >= 16) return "Très Bien";
+  if(note >= 14) return "Bien";
+  if(note >= 12) return "Assez Bien";
+  if(note >= 10) return "Passable";
+  return "À revoir lors d'une prochaine visite";
+}
+
+function updateProgress() {
+  let n = 0;
+  VF_DATA.forEach(item => { if(etat.vf[item.id]) n++; });
+  INTRUS_DATA.forEach(s => { if(etat.intrus[s.id]!==undefined && etat.intrus[s.id]!==null) n++; });
+  document.getElementById('progress-badge').textContent = n + ' / 20';
+}
+
+// ═══════════════════════════════════════════════════
+//  PIN
+// ═══════════════════════════════════════════════════
+function ouvrirPin() {
+  pinBuffer = "";
+  updatePinDisplay();
+  document.getElementById('pin-error').textContent = '';
+  document.getElementById('modal-pin').classList.add('show');
+}
+function fermerPin() {
+  document.getElementById('modal-pin').classList.remove('show');
+  pinBuffer = "";
+}
+function pinKey(k) {
+  if(pinBuffer.length >= 4) return;
+  pinBuffer += k;
+  updatePinDisplay();
+  if(pinBuffer.length === 4) {
+    setTimeout(() => {
+      if(pinBuffer === PIN_CORRECT) {
+        fermerPin();
+        // Afficher corrigé
+        afficherCorrige();
+      } else {
+        document.getElementById('pin-error').textContent = 'Code incorrect. Réessayez.';
+        pinBuffer = "";
+        updatePinDisplay();
+      }
+    }, 200);
+  }
+}
+function pinDel() {
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDisplay();
+  document.getElementById('pin-error').textContent = '';
+}
+function updatePinDisplay() {
+  for(let i=0;i<4;i++) {
+    document.getElementById('pd'+i).classList.toggle('filled', i < pinBuffer.length);
+  }
+}
+
+function afficherCorrige() {
+  // Aller sur l'onglet résultats et y afficher le corrigé complet
+  switchTab('fin', document.querySelector('[data-tab=fin]'));
+  renderResultats();
+  // Scroll en bas
+  setTimeout(()=>{ const tc=document.getElementById('tab-fin'); if(tc) tc.scrollTop=tc.scrollHeight; },300);
+  // Toast
+  const toast = document.createElement('div');
+  toast.textContent = '🔐 Corrigé déverrouillé';
+  toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:var(--sepia);color:var(--or-pale);padding:10px 20px;border-radius:3px;font-family:Georgia,serif;font-size:13px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,0.4);';
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(), 2500);
+}
+
+// ═══════════════════════════════════════════════════
+//  TIRAGE IMAGE
+// ═══════════════════════════════════════════════════
+function tirerImage() {
+  const img = IMAGES_COLLECTION[Math.floor(Math.random()*IMAGES_COLLECTION.length)];
+  document.getElementById('tirage-nom').textContent = img.nom;
+  document.getElementById('tirage-date').textContent = img.date;
+  document.getElementById('tirage-desc').textContent = img.desc;
+  document.getElementById('boite-btn').style.display='none';
+  document.getElementById('tirage-instruction').textContent = "Voici votre image de collection !";
+
+  // Dessin SVG inline selon style
+  const vigSvg = document.getElementById('tirage-vig');
+  vigSvg.innerHTML = getBatSVG(img.style, 100, 80);
+
+  const revealed = document.getElementById('image-revelee');
+  revealed.classList.remove('show');
+  setTimeout(()=>revealed.classList.add('show'), 50);
+}
+
+function nouveauTirage() {
+  document.getElementById('image-revelee').classList.remove('show');
+  document.getElementById('boite-btn').style.display='block';
+  document.getElementById('tirage-instruction').textContent = "Tapez à nouveau sur la boîte pour tirer une autre image.";
+}
+
+function getBatSVG(style, w, h) {
+  const cx = w/2;
+  if(style==='gothique') return `
+    <rect x="${cx-18}" y="${h*0.28}" width="36" height="${h*0.55}" fill="#ddc898" stroke="#5c3a10" stroke-width="1"/>
+    <path d="M${cx-22},${h*0.28} Q${cx-18},${h*0.1} ${cx},${h*0.06} Q${cx+18},${h*0.1} ${cx+22},${h*0.28} Z" fill="#c49a50" stroke="#5c3a10" stroke-width="0.8"/>
+    <rect x="${cx-8}" y="${h*0.4}" width="7" height="12" rx="3" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+    <rect x="${cx+1}" y="${h*0.4}" width="7" height="12" rx="3" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+    <circle cx="${cx}" cy="${h*0.33}" r="4" fill="none" stroke="#5c3a10" stroke-width="0.6"/>
+    <line x1="${cx-22}" y1="${h*0.84}" x2="${cx+22}" y2="${h*0.84}" stroke="#5c3a10" stroke-width="1.2"/>`;
+  if(style==='baroque') return `
+    <rect x="${cx-22}" y="${h*0.32}" width="44" height="${h*0.5}" fill="#ddc898" stroke="#5c3a10" stroke-width="1"/>
+    <polygon points="${cx-26},${h*0.32} ${cx},${h*0.1} ${cx+26},${h*0.32}" fill="#c49a50" stroke="#5c3a10" stroke-width="0.8"/>
+    <rect x="${cx-20}" y="${h*0.32}" width="5" height="${h*0.5}" fill="#e8d8a8" stroke="#5c3a10" stroke-width="0.5"/>
+    <rect x="${cx-2}" y="${h*0.32}" width="5" height="${h*0.5}" fill="#e8d8a8" stroke="#5c3a10" stroke-width="0.5"/>
+    <rect x="${cx+16}" y="${h*0.32}" width="5" height="${h*0.5}" fill="#e8d8a8" stroke="#5c3a10" stroke-width="0.5"/>
+    <rect x="${cx-12}" y="${h*0.44}" width="10" height="16" rx="2" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+    <rect x="${cx+2}" y="${h*0.44}" width="10" height="16" rx="2" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+    <line x1="${cx-26}" y1="${h*0.84}" x2="${cx+26}" y2="${h*0.84}" stroke="#5c3a10" stroke-width="1.2"/>`;
+  if(style==='industriel') return `
+    <rect x="${cx-24}" y="${h*0.4}" width="48" height="${h*0.44}" fill="#ddc898" stroke="#5c3a10" stroke-width="1"/>
+    <rect x="${cx+12}" y="${h*0.15}" width="8" height="${h*0.25}" fill="#ddc898" stroke="#5c3a10" stroke-width="0.8"/>
+    <rect x="${cx-20}" y="${h*0.5}" width="8" height="12" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+    <rect x="${cx-8}" y="${h*0.5}" width="8" height="12" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+    <rect x="${cx+4}" y="${h*0.5}" width="8" height="12" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+    <rect x="${cx-6}" y="${h*0.63}" width="12" height="${h*0.21}" fill="#5c3a10"/>
+    <line x1="${cx-24}" y1="${h*0.85}" x2="${cx+24}" y2="${h*0.85}" stroke="#5c3a10" stroke-width="1.2"/>`;
+  if(style==='medieval') return `
+    <rect x="${cx-14}" y="${h*0.3}" width="28" height="${h*0.54}" fill="#ddc898" stroke="#5c3a10" stroke-width="1"/>
+    <rect x="${cx-22}" y="${h*0.24}" width="10" height="${h*0.6}" fill="#c49a50" stroke="#5c3a10" stroke-width="0.8"/>
+    <rect x="${cx+12}" y="${h*0.24}" width="10" height="${h*0.6}" fill="#c49a50" stroke="#5c3a10" stroke-width="0.8"/>
+    <polygon points="${cx},${h*0.06} ${cx+16},${h*0.24} ${cx-16},${h*0.24}" fill="#8b3a2a" stroke="#5c3a10" stroke-width="0.8"/>
+    <rect x="${cx-6}" y="${h*0.52}" width="12" height="${h*0.32}" rx="6" fill="#5c3a10"/>
+    <line x1="${cx-26}" y1="${h*0.85}" x2="${cx+26}" y2="${h*0.85}" stroke="#5c3a10" stroke-width="1.2"/>`;
+  // eclectique par défaut
+  return `
+    <rect x="${cx-22}" y="${h*0.35}" width="44" height="${h*0.48}" fill="#ddc898" stroke="#5c3a10" stroke-width="1"/>
+    <path d="M${cx-10},${h*0.35} A10,14 0 0,1 ${cx+10},${h*0.35}" fill="#c49a50" stroke="#5c3a10" stroke-width="0.8"/>
+    <rect x="${cx-18}" y="${h*0.35}" width="4" height="${h*0.48}" fill="#e8d8a8" stroke="#5c3a10" stroke-width="0.4"/>
+    <rect x="${cx-1}" y="${h*0.35}" width="4" height="${h*0.48}" fill="#e8d8a8" stroke="#5c3a10" stroke-width="0.4"/>
+    <rect x="${cx+14}" y="${h*0.35}" width="4" height="${h*0.48}" fill="#e8d8a8" stroke="#5c3a10" stroke-width="0.4"/>
+    <rect x="${cx-12}" y="${h*0.46}" width="10" height="15" rx="5" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+    <rect x="${cx+2}" y="${h*0.46}" width="10" height="15" rx="1" fill="#f2e8cc" stroke="#5c3a10" stroke-width="0.6"/>
+    <line x1="${cx-22}" y1="${h*0.84}" x2="${cx+22}" y2="${h*0.84}" stroke="#5c3a10" stroke-width="1.2"/>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+function renderAll() {
+  renderVF();
+  renderIntrus();
+  renderMissions();
+  // Date par défaut
+  const di = document.getElementById('inp-date');
+  if(di && !di.value) di.value = new Date().toISOString().split('T')[0];
+  updateProgress();
+}
+
+// Init date
+window.addEventListener('DOMContentLoaded', () => {
+  const di = document.getElementById('inp-date');
+  if(di) di.value = new Date().toISOString().split('T')[0];
+});
+</script>
+
+<!-- ═══════════════ BANNIÈRE INSTALLATION PWA ═══════════════ -->
+<div id="pwa-banner">
+  <div class="pwa-banner-row">
+    <div class="pwa-banner-icon">🏛️</div>
+    <div class="pwa-banner-text">
+      <div class="pwa-banner-title">Installer l'application</div>
+      <div class="pwa-banner-sub">Livret Architecture de Lille — Musée des Écoles</div>
+    </div>
+  </div>
+  <div class="pwa-banner-btns">
+    <button class="pwa-btn-install" onclick="installerApp()">✦ Installer sur cet écran</button>
+    <button class="pwa-btn-later" onclick="document.getElementById('pwa-banner').classList.remove('show')">Plus tard</button>
+  </div>
+</div>
+
+<!-- ═══════════════ GUIDE INSTALLATION MANUEL ═══════════════ -->
+<div id="install-guide">
+  <div class="guide-box">
+    <div class="guide-title">✦ Installer le Livret ✦</div>
+    <div class="guide-sub">en 3 étapes simples sur votre tablette Android</div>
+
+    <div class="guide-step">
+      <div class="guide-num">1</div>
+      <div class="guide-step-text">
+        Ouvrez ce fichier dans <strong>Google Chrome</strong> sur la tablette.
+      </div>
+    </div>
+    <div class="guide-step">
+      <div class="guide-num">2</div>
+      <div class="guide-step-text">
+        Touchez les <strong>⋮ trois points</strong> en haut à droite de Chrome.
+      </div>
+    </div>
+    <div class="guide-step">
+      <div class="guide-num">3</div>
+      <div class="guide-step-text">
+        Choisissez <strong>« Ajouter à l'écran d'accueil »</strong> puis confirmez.<br>
+        <span style="color:#8a5a20;font-size:11px;">L'icône 🏛️ apparaît sur l'écran d'accueil. L'app s'ouvre en plein écran, sans Chrome.</span>
+      </div>
+    </div>
+
+    <div style="background:#f0d060;border-radius:4px;padding:8px 10px;margin-top:4px;">
+      <div style="font-family:Georgia,serif;font-size:11px;color:#1a0f02;font-weight:bold;">
+        💡 Fonctionne entièrement HORS-LIGNE après installation.
+      </div>
+    </div>
+
+    <button class="guide-close" onclick="document.getElementById('install-guide').classList.remove('show')">
+      Compris — Commencer la visite
+    </button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  PWA — GESTION INSTALLATION
+// ═══════════════════════════════════════════════════
+let deferredPrompt = null;
+
+// Chrome intercepte l'événement beforeinstallprompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Affiche la bannière après 2 secondes
+  setTimeout(() => {
+    document.getElementById('pwa-banner').classList.add('show');
+  }, 2000);
+});
+
+function installerApp() {
+  document.getElementById('pwa-banner').classList.remove('show');
+  if (deferredPrompt) {
+    // Chrome natif : déclenche la boîte d'installation système
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choice => {
+      if (choice.outcome === 'accepted') {
+        console.log('App installée !');
+      }
+      deferredPrompt = null;
+    });
+  } else {
+    // Fallback : affiche le guide manuel
+    document.getElementById('install-guide').classList.add('show');
+  }
+}
+
+// Si déjà installée en standalone, pas de bannière
+if (window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true) {
+  document.getElementById('pwa-banner').style.display = 'none';
+}
+
+// Afficher le guide dès l'ouverture si pas encore installée
+window.addEventListener('load', () => {
+  const standalone = window.matchMedia('(display-mode: standalone)').matches
+                  || window.navigator.standalone === true;
+  if (!standalone) {
+    document.getElementById('install-guide').classList.add('show');
+  }
+});
+
+// Confirmation après installation
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwa-banner').classList.remove('show');
+  // Petit toast de confirmation
+  const toast = document.createElement('div');
+  toast.innerHTML = '✦ Application installée !';
+  toast.style.cssText = [
+    'position:fixed', 'top:20px', 'left:50%', 'transform:translateX(-50%)',
+    'background:#1a4a2a', 'color:#f0d060', 'padding:12px 24px',
+    'border-radius:4px', 'font-family:Georgia,serif', 'font-size:14px',
+    'z-index:9999', 'box-shadow:0 4px 20px rgba(0,0,0,0.5)',
+    'border:1px solid #b8860b'
+  ].join(';');
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+});
+</script>
+</body>
+</html>
