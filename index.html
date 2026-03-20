@@ -1228,7 +1228,7 @@ html, body {
     </div>
     <div class="topbar-right">
       <div class="progress-badge" id="progress-badge">0 / 20</div>
-      <button class="btn-pin" onclick="ouvrirPin()">🔐 Corrigé</button>
+      <button class="btn-pin" onclick="afficherCorrige()">✦ Corrigé</button>
     </div>
   </div>
 
@@ -1999,11 +1999,93 @@ function afficherCorrige() {
   setTimeout(()=>{ const tc=document.getElementById('tab-fin'); if(tc) tc.scrollTop=tc.scrollHeight; },300);
   // Toast
   const toast = document.createElement('div');
-  toast.textContent = '🔐 Corrigé déverrouillé';
+  toast.textContent = '✦ Corrigé';
   toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:var(--sepia);color:var(--or-pale);padding:10px 20px;border-radius:3px;font-family:Georgia,serif;font-size:13px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,0.4);';
   document.body.appendChild(toast);
   setTimeout(()=>toast.remove(), 2500);
+
+  // Préparer les données
+  try {
+    const nomInput = document.getElementById('inp-nom');
+    const nom = nomInput ? nomInput.value || 'Anonyme' : 'Anonyme';
+    const dateInput = document.getElementById('inp-date');
+    const date = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
+
+    let scoreVF = 0;
+    let detailVF = [];
+    VF_DATA.forEach(item => {
+      const rep = etat.vf[item.id];
+      const ok = (rep==='vrai' && item.correct) || (rep==='faux' && !item.correct);
+      if(ok) scoreVF++;
+      detailVF.push(item.texte.substring(0,40) + ' → ' + (rep || '?') + (ok?' ✓':' ✗'));
+    });
+
+    let scoreIntrus = 0;
+    INTRUS_DATA.forEach(serie => {
+      if(etat.intrus[serie.id] === serie.intrus) scoreIntrus++;
+    });
+
+    const scoreTotal = scoreVF + scoreIntrus;
+    const payload = {
+      nom, date,
+      scoreVF: scoreVF + '/6',
+      scoreIntrus: scoreIntrus + '/3',
+      scoreTotal: scoreTotal + '/10',
+      mention: getMention(scoreTotal * 2),
+      detailVF: detailVF.join(' | '),
+      progression: document.getElementById('progress-badge').textContent
+    };
+
+    // Afficher un toast selon la connexion
+    const toastEnvoi = document.createElement('div');
+    toastEnvoi.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:4px;font-family:Georgia,serif;font-size:12px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.4);text-align:center;max-width:280px;line-height:1.5;';
+
+    if (navigator.onLine) {
+      // En ligne → envoi immédiat
+      fetch('https://script.google.com/macros/s/AKfycbyfZWD-TxL8jv5fA2rTO49iKbNFcDaDQZMJDoNdnrZl1EbIblZRZYHViyMrWkFzgeGu/exec', {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(()=>{});
+      toastEnvoi.style.background = 'var(--vert)';
+      toastEnvoi.style.color = 'var(--or-pale)';
+      toastEnvoi.style.border = '1px solid var(--or)';
+      toastEnvoi.innerHTML = '📶 Vos résultats ont été envoyés au musée.';
+    } else {
+      // Hors-ligne → sauvegarder et envoyer plus tard
+      try { localStorage.setItem('resultats_en_attente', JSON.stringify(payload)); } catch(e){}
+      toastEnvoi.style.background = 'var(--sepia)';
+      toastEnvoi.style.color = 'var(--or-pale)';
+      toastEnvoi.style.border = '1px solid var(--or)';
+      toastEnvoi.innerHTML = '📵 Pas de connexion.<br><span style="font-style:italic;font-size:11px;">Vos résultats seront envoyés automatiquement dès que vous aurez du réseau.</span>';
+    }
+
+    document.body.appendChild(toastEnvoi);
+    setTimeout(() => toastEnvoi.remove(), 5000);
+
+  } catch(e) {}
 }
+
+// Envoi automatique si résultats en attente dès retour connexion
+window.addEventListener('online', () => {
+  try {
+    const pending = localStorage.getItem('resultats_en_attente');
+    if (pending) {
+      fetch('https://script.google.com/macros/s/AKfycbyfZWD-TxL8jv5fA2rTO49iKbNFcDaDQZMJDoNdnrZl1EbIblZRZYHViyMrWkFzgeGu/exec', {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: pending
+      }).then(() => {
+        localStorage.removeItem('resultats_en_attente');
+        const t = document.createElement('div');
+        t.textContent = '📶 Résultats envoyés au musée !';
+        t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--vert);color:var(--or-pale);padding:12px 20px;border-radius:4px;font-family:Georgia,serif;font-size:12px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.4);border:1px solid var(--or);';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 4000);
+      }).catch(()=>{});
+    }
+  } catch(e) {}
+});
 
 // ═══════════════════════════════════════════════════
 //  TIRAGE IMAGE
