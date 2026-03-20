@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classement — Architecture de Lille</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: #0a1628;
+    font-family: Georgia, serif;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .sky {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(180deg,
+      #0a1628 0%, #1a3a6e 25%, #2d6bb5 50%,
+      #f4a940 70%, #f7c96e 80%, #fde9a2 90%, #fff8e0 100%);
+    z-index: 0;
+  }
+
+  .sun {
+    position: fixed;
+    bottom: 38%; left: 50%;
+    transform: translateX(-50%);
+    width: 90px; height: 90px;
+    background: radial-gradient(circle, #fff7a0 0%, #f9d030 40%, #f4a940 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 60px 30px rgba(249,208,48,0.5), 0 0 120px 60px rgba(244,169,64,0.25);
+    z-index: 1;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.05); }
+  }
+
+  .beffroi { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 2; opacity: 0.92; }
+
+  .cloud {
+    position: fixed;
+    background: rgba(255,255,255,0.7);
+    border-radius: 50px;
+    z-index: 1;
+    animation: drift linear infinite;
+  }
+  @keyframes drift { from { transform: translateX(-120px); } to { transform: translateX(110vw); } }
+
+  .page {
+    position: relative; z-index: 10;
+    min-height: 100vh;
+    padding: 20px 20px 40px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  .titre-bloc { text-align: center; margin-bottom: 24px; margin-top: 8px; }
+  .titre-main {
+    font-family: Georgia, serif;
+    font-size: 28px; font-weight: 700;
+    color: #fff8e0;
+    text-shadow: 0 0 20px rgba(244,169,64,0.9), 2px 2px 4px rgba(0,0,0,0.8);
+    letter-spacing: 3px; text-transform: uppercase;
+  }
+  .titre-sub {
+    font-size: 13px; color: #f9d030;
+    font-style: italic; letter-spacing: 2px; margin-top: 4px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+  }
+  .titre-sep { color: #f9d030; font-size: 18px; letter-spacing: 6px; margin-top: 4px; text-shadow: 0 0 10px rgba(249,208,48,0.8); }
+
+  .podium {
+    display: flex; align-items: flex-end; justify-content: center;
+    gap: 8px; margin-bottom: 24px; width: 100%; max-width: 600px;
+  }
+  .podium-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    animation: podiumAppear 0.6s ease both;
+  }
+  .podium-item:nth-child(1) { animation-delay: 0.1s; }
+  .podium-item:nth-child(2) { animation-delay: 0s; }
+  .podium-item:nth-child(3) { animation-delay: 0.2s; }
+  @keyframes podiumAppear {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .podium-medaille { font-size: 28px; margin-bottom: 4px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+  .podium-nom {
+    font-size: 13px; font-weight: bold; color: #fff8e0;
+    text-align: center; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+    margin-bottom: 3px; max-width: 120px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .podium-score {
+    font-size: 20px; font-weight: bold; color: #f9d030;
+    text-shadow: 0 0 10px rgba(249,208,48,0.7), 1px 1px 3px rgba(0,0,0,0.8);
+    margin-bottom: 6px;
+  }
+  .podium-socle {
+    width: 100%; border-radius: 6px 6px 0 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: bold;
+    color: rgba(255,255,255,0.9); text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  }
+  .socle-1 { height: 100px; background: linear-gradient(180deg, #f9d030, #c8960a); box-shadow: 0 4px 20px rgba(249,208,48,0.5); }
+  .socle-2 { height: 70px; background: linear-gradient(180deg, #d0d0d0, #888); }
+  .socle-3 { height: 50px; background: linear-gradient(180deg, #d4935a, #8b5520); }
+
+  .tableau {
+    width: 100%; max-width: 600px;
+    background: rgba(15,25,50,0.75);
+    border: 1px solid rgba(249,208,48,0.4);
+    border-radius: 8px; overflow: hidden;
+    backdrop-filter: blur(8px);
+  }
+  .tableau-header {
+    background: rgba(249,208,48,0.15);
+    border-bottom: 1px solid rgba(249,208,48,0.3);
+    display: grid; grid-template-columns: 48px 1fr 70px 70px;
+    padding: 10px 14px;
+    font-size: 11px; color: rgba(249,208,48,0.7);
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .ligne {
+    display: grid; grid-template-columns: 48px 1fr 70px 70px;
+    padding: 10px 14px;
+    border-bottom: 0.5px solid rgba(249,208,48,0.1);
+    align-items: center;
+    animation: lineAppear 0.5s ease both;
+    transition: background 0.2s;
+  }
+  .ligne:hover { background: rgba(249,208,48,0.07); }
+  .ligne:last-child { border-bottom: none; }
+  @keyframes lineAppear {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .rang { font-size: 14px; font-weight: bold; color: rgba(249,208,48,0.6); text-align: center; }
+  .eleve-nom { font-size: 14px; color: #fff8e0; font-style: italic; }
+  .score-bar-wrap { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 2px; }
+  .score-bar { height: 3px; background: linear-gradient(90deg, #f9d030, #f4a940); border-radius: 2px; transition: width 0.8s ease; }
+  .score-val { font-size: 16px; font-weight: bold; color: #f9d030; text-align: center; text-shadow: 0 0 8px rgba(249,208,48,0.5); }
+  .mention-val { font-size: 10px; color: rgba(249,208,48,0.65); font-style: italic; text-align: right; line-height: 1.3; }
+
+  .footer { margin-top: 16px; text-align: center; font-size: 11px; color: rgba(249,208,48,0.5); font-style: italic; letter-spacing: 1px; }
+  .dot-live {
+    display: inline-block; width: 8px; height: 8px;
+    background: #4cff80; border-radius: 50%; margin-right: 6px;
+    animation: blink 1.2s ease-in-out infinite; vertical-align: middle;
+  }
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+  .vide { text-align: center; padding: 30px; color: rgba(249,208,48,0.5); font-style: italic; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="sky"></div>
+<div class="sun"></div>
+
+<div class="cloud" style="width:180px;height:50px;top:12%;left:-10%;animation-duration:22s;opacity:0.6;"></div>
+<div class="cloud" style="width:120px;height:35px;top:20%;left:60%;animation-duration:28s;opacity:0.4;animation-delay:-10s;"></div>
+<div class="cloud" style="width:200px;height:55px;top:8%;left:30%;animation-duration:35s;opacity:0.5;animation-delay:-5s;"></div>
+
+<svg class="beffroi" width="320" height="420" viewBox="0 0 320 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="160" cy="415" rx="80" ry="8" fill="rgba(0,0,0,0.3)"/>
+  <rect x="110" y="200" width="100" height="215" fill="#1a1205" opacity="0.95"/>
+  <rect x="130" y="220" width="18" height="26" rx="9" fill="#f9d030" opacity="0.7"/>
+  <rect x="172" y="220" width="18" height="26" rx="9" fill="#f9d030" opacity="0.7"/>
+  <rect x="130" y="265" width="18" height="26" rx="9" fill="#f9d030" opacity="0.5"/>
+  <rect x="172" y="265" width="18" height="26" rx="9" fill="#f9d030" opacity="0.5"/>
+  <rect x="130" y="310" width="18" height="26" rx="9" fill="#f9d030" opacity="0.4"/>
+  <rect x="172" y="310" width="18" height="26" rx="9" fill="#f9d030" opacity="0.4"/>
+  <rect x="143" y="360" width="34" height="55" rx="17" fill="#0a1628" opacity="0.9"/>
+  <rect x="95" y="160" width="130" height="45" fill="#120d03" opacity="0.95"/>
+  <rect x="88" y="155" width="144" height="10" rx="2" fill="#2a1e08"/>
+  <rect x="90" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="100" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="110" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="120" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="130" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="140" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="150" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="160" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="170" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="180" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="190" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="200" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="210" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="220" y="145" width="4" height="20" fill="#2a1e08"/>
+  <rect x="125" y="80" width="70" height="85" fill="#0f0a02" opacity="0.97"/>
+  <circle cx="160" cy="118" r="22" fill="#1a1205" stroke="#f9d030" stroke-width="2.5"/>
+  <circle cx="160" cy="118" r="18" fill="#0a0800" opacity="0.9"/>
+  <circle cx="160" cy="118" r="2" fill="#f9d030"/>
+  <line x1="160" y1="118" x2="160" y2="104" stroke="#f9d030" stroke-width="2" stroke-linecap="round"/>
+  <line x1="160" y1="118" x2="170" y2="122" stroke="#f4a940" stroke-width="1.5" stroke-linecap="round"/>
+  <polygon points="125,80 160,30 195,80" fill="#080600" opacity="0.97"/>
+  <line x1="160" y1="30" x2="160" y2="10" stroke="#f9d030" stroke-width="1.5"/>
+  <polygon points="160,10 172,18 160,22 148,18" fill="#f9d030" opacity="0.9"/>
+  <rect x="145" y="88" width="12" height="18" rx="6" fill="#f9d030" opacity="0.6"/>
+  <rect x="163" y="88" width="12" height="18" rx="6" fill="#f9d030" opacity="0.6"/>
+</svg>
+
+<div class="page">
+  <div class="titre-bloc">
+    <div class="titre-sep">✦ ✦ ✦</div>
+    <div class="titre-main">Tableau des Observateurs</div>
+    <div class="titre-sub">Architecture de Lille — Musée des Écoles 2025</div>
+    <div class="titre-sep">✦ ✦ ✦</div>
+  </div>
+
+  <div class="podium" id="podium">
+    <div class="vide">Chargement du classement...</div>
+  </div>
+
+  <div class="tableau" id="tableau" style="display:none;">
+    <div class="tableau-header">
+      <div>Rang</div>
+      <div>Observateur</div>
+      <div style="text-align:center;">Score</div>
+      <div style="text-align:right;">Mention</div>
+    </div>
+    <div id="lignes"></div>
+  </div>
+
+  <div class="footer">
+    <span class="dot-live"></span>
+    Mise à jour en direct — <span id="last-update">chargement...</span>
+  </div>
+</div>
+
+<script>
+const SHEET_ID = '1ivudmsnGan2Wawq8IXIZGCCxa670aKQdL_N3C22HWXY';
+const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+const MEDAILLES = ['🥇','🥈','🥉'];
+
+function parseScore(s) {
+  const m = String(s||'').match(/(\d+)/);
+  return m ? parseInt(m[1]) : 0;
+}
+
+function timeNow() {
+  return new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+async function charger() {
+  try {
+    const r = await fetch(URL + '&t=' + Date.now());
+    const txt = await r.text();
+    const json = JSON.parse(txt.replace(/^.*?({.*}).*$/s, '$1'));
+    const rows = json.table.rows || [];
+
+    let eleves = rows.map(row => {
+      const c = row.c || [];
+      return {
+        nom: c[1] ? String(c[1].v || 'Anonyme') : 'Anonyme',
+        scoreTotal: c[4] ? String(c[4].v || '0/10') : '0/10',
+        mention: c[5] ? String(c[5].v || '') : '',
+      };
+    }).filter(e => e.nom && e.nom !== 'Anonyme');
+
+    eleves.sort((a,b) => parseScore(b.scoreTotal) - parseScore(a.scoreTotal));
+
+    afficherPodium(eleves.slice(0,3));
+    afficherTableau(eleves);
+    document.getElementById('last-update').textContent = timeNow();
+  } catch(e) {
+    document.getElementById('last-update').textContent = 'Erreur — vérifiez le partage du Sheet';
+  }
+}
+
+function afficherPodium(top) {
+  const el = document.getElementById('podium');
+  if (top.length === 0) { el.innerHTML = '<div class="vide">En attente des premiers résultats...</div>'; return; }
+  const ordre = [top[1], top[0], top[2]].filter(Boolean);
+  const socles = top[1] ? ['socle-2','socle-1','socle-3'] : ['socle-1','socle-3'];
+  const rangs = top[1] ? [1,0,2] : [0,1];
+  el.innerHTML = ordre.map((e,i) => `
+    <div class="podium-item">
+      <div class="podium-medaille">${MEDAILLES[rangs[i]]}</div>
+      <div class="podium-nom">${e.nom}</div>
+      <div class="podium-score">${e.scoreTotal}</div>
+      <div class="podium-socle ${socles[i]}">${rangs[i]+1}</div>
+    </div>`).join('');
+}
+
+function afficherTableau(eleves) {
+  const tableau = document.getElementById('tableau');
+  const lignes = document.getElementById('lignes');
+  if (eleves.length === 0) { tableau.style.display='none'; return; }
+  tableau.style.display = 'block';
+  lignes.innerHTML = eleves.map((e,i) => {
+    const pct = Math.round((parseScore(e.scoreTotal) / 10) * 100);
+    return `<div class="ligne" style="animation-delay:${i*0.06}s">
+      <div class="rang">${i+1}</div>
+      <div><div class="eleve-nom">${e.nom}</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:${pct}%"></div></div>
+      </div>
+      <div class="score-val">${e.scoreTotal}</div>
+      <div class="mention-val">${e.mention}</div>
+    </div>`;
+  }).join('');
+}
+
+charger();
+setInterval(charger, 10000);
+</script>
+</body>
+</html>
